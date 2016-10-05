@@ -48,13 +48,14 @@ public class Cnf {
 			}
 		}
 	}
-	
+
 	public static void columnAssignment(int n){
 		  /*
 		  Column Assignments
 		  */
 		  String sub1 = "";
 			String sub2 = "";
+			int hold_var = 2;
 			for(int j = 1; j <= n; j++){
 		    for(int i = 1; i <= n; i++){
 		      if(i == n){
@@ -67,15 +68,19 @@ public class Cnf {
 				for(int i = 1; i <= n; i++){
 					for(int j = 1; j < n; j++){
 						sub2 += -getIndex(i,1) + " " + -getIndex(i,j+1) + " 0\n";
+						if(hold_var < n){
+							sub2 += -getIndex(i,hold_var) + " " + -getIndex(i,hold_var + 1) + " 0\n";
 						}
+						hold_var++;
+						}
+						hold_var = 2;
 					}
 
 		  String result = sub1 + sub2;
 		  System.out.println(result);
 		}
-	
+
 	public static int getIndex(int row, int column) {
 		return (N * (row - 1)) + column;
 	}
 }
-
