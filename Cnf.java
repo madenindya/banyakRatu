@@ -15,6 +15,8 @@ public class Cnf {
 		N = Integer.parseInt(bf.readLine());
 		N2 = N * N;
 
+		System.out.println("Kolom:");
+		rowAssignment(N);
 		System.out.println("Diagonal kanan:");
 		diagonalKanan(N);
 		System.out.println("Diagonal kiri:");
@@ -54,23 +56,27 @@ public class Cnf {
 	}
 }
 
-public static void RowAssignment(int n){
+public static void rowAssignment(int n){
   /*
   Column Assignments
   */
   String sub1 = "";
-  String sub2 = "";
-  for(int j = 1; j <= n; j++){
+	String sub2 = "";
+	for(int j = 1; j <= n; j++){
     for(int i = 1; i <= n; i++){
       if(i == n){
-        sub1 += (j-1)*n+i + " 0\n";
-        sub2 += -1*((j-1)*n+i) + " 0\n";
+        sub1 += getIndex(j, i)+ " 0\n";
       }else{
-        sub1 += (j-1)*n+i + " ";
-        sub2 += -1*((j-1)*n+i) + " ";
+        sub1 += getIndex(j, i) + " ";
        }
       }
     }
+		for(int i = 1; j <= n; j++){
+			for(int j = 1; i < n; i++){
+				sub2 += -getIndex(i,1) + " " + -getIndex(i,j+1) + " 0\n";
+				}
+			}
+
   String result = sub1 + sub2;
   System.out.println(result);
 }
