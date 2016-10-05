@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 public class Cnf {
 
 	public static int N;
-	public static int N2;
 
 	public static void main(String[] args) throws NumberFormatException,
 			IOException {
@@ -13,8 +12,9 @@ public class Cnf {
 		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
 		N = Integer.parseInt(bf.readLine());
-		N2 = N * N;
 
+		System.out.println("Kolom:");
+		columnAssignment(N);
 		System.out.println("Diagonal kanan:");
 		diagonalKanan(N);
 		System.out.println("Diagonal kiri:");
@@ -29,7 +29,7 @@ public class Cnf {
 				tmp--;
 				for (int k = 1; k < n - tmp; k++) {
 					int now2 = getIndex(i + k, j + k);
-					System.out.println("-" + now + " -" + now2);
+					System.out.println("-" + now + " -" + now2 + " 0");
 				}
 			}
 		}
@@ -43,13 +43,39 @@ public class Cnf {
 				int tmp = i > j2 ? i : j2;
 				for (int k = 1; k <= n - tmp; k++) {
 					int now2 = getIndex(i + k, j - k);
-					System.out.println("-" + now + " -" + now2);
+					System.out.println("-" + now + " -" + now2 +" 0");
 				}
 			}
 		}
 	}
+	
+	public static void columnAssignment(int n){
+		  /*
+		  Column Assignments
+		  */
+		  String sub1 = "";
+			String sub2 = "";
+			for(int j = 1; j <= n; j++){
+		    for(int i = 1; i <= n; i++){
+		      if(i == n){
+		        sub1 += getIndex(j, i)+ " 0\n";
+		      }else{
+		        sub1 += getIndex(j, i) + " ";
+		       }
+		      }
+		    }
+				for(int i = 1; i <= n; i++){
+					for(int j = 1; j < n; j++){
+						sub2 += -getIndex(i,1) + " " + -getIndex(i,j+1) + " 0\n";
+						}
+					}
 
+		  String result = sub1 + sub2;
+		  System.out.println(result);
+		}
+	
 	public static int getIndex(int row, int column) {
 		return (N * (row - 1)) + column;
 	}
 }
+
