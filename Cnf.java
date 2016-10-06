@@ -5,23 +5,29 @@ import java.io.InputStreamReader;
 public class Cnf {
 
 	public static int N;
+	public static int jumlahClause;
 
 	public static void main(String[] args) throws NumberFormatException,
 			IOException {
 
 		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-
+		
 		N = Integer.parseInt(bf.readLine());
-
-		System.out.println("Kolom:");
-		columnAssignment(N);
-		System.out.println("Diagonal kanan:");
-		diagonalKanan(N);
-		System.out.println("Diagonal kiri:");
-		diagonalKiri(N);
+		jumlahClause = N + (N * N * (N-1));
+		
+		String result = "";
+		result += rowAssignment(N);
+		result += columnAssignment(N);
+		result += diagonalKanan(N);
+		result += diagonalKiri(N);
+		
+		System.out.println("c CNF untuk " + N + "-Queens");
+		System.out.println("p cnf " + N + " " + jumlahClause);
+		System.out.print(result);
 	}
 
-	public static void diagonalKanan(int n) {
+	public static String diagonalKanan(int n) {
+		String result = "";
 		for (int i = 1; i < n; i++) {
 			for (int j = 1; j < n; j++) {
 				int now = getIndex(i, j);
@@ -29,13 +35,17 @@ public class Cnf {
 				tmp--;
 				for (int k = 1; k < n - tmp; k++) {
 					int now2 = getIndex(i + k, j + k);
-					System.out.println("-" + now + " -" + now2 + " 0");
+					jumlahClause++;
+					result += "-" + now + " -" + now2 + " 0\n";
 				}
 			}
 		}
+		
+		return result;
 	}
 
-	public static void diagonalKiri(int n) {
+	public static String diagonalKiri(int n) {
+		String result = "";
 		for (int i = 1; i < n; i++) {
 			for (int j = n; j > 1; j--) {
 				int now = getIndex(i, j);
@@ -43,16 +53,17 @@ public class Cnf {
 				int tmp = i > j2 ? i : j2;
 				for (int k = 1; k <= n - tmp; k++) {
 					int now2 = getIndex(i + k, j - k);
-					System.out.println("-" + now + " -" + now2 + " 0");
+					jumlahClause++;
+					result += "-" + now + " -" + now2 + " 0\n";
 				}
 			}
 		}
+		
+		return result;
 	}
 
-	public static void columnAssignment(int n) {
-		/*
-		 * Column Assignments
-		 */
+	public static String rowAssignment(int n){
+		// Row Assignment
 		String sub1 = "";
 		String sub2 = "";
 		
@@ -76,8 +87,22 @@ public class Cnf {
 			}
 		}
 
-		String result = sub1 + sub2;
-		System.out.print(result);
+		return sub1 + sub2;
+	}
+	
+
+	public static String columnAssignment(int n){
+		//combination
+		String sub2 = "";
+		for(int col = 1; col <= n; col++){
+			for(int pivotRow = 1; pivotRow <= n-1; pivotRow++){
+				for(int combination = pivotRow+1; combination <=n; combination++){
+					sub2 += "-" + getIndex(pivotRow, col) + " -" + getIndex(combination, col) + " 0\n";
+				}
+			}
+		}
+
+		return sub2;
 	}
 
 	public static int getIndex(int row, int column) {
