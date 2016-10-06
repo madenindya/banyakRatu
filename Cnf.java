@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 public class Cnf {
 
@@ -12,6 +13,7 @@ public class Cnf {
 
 		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 		
+		System.out.print("Masukan ukuran board: ");
 		N = Integer.parseInt(bf.readLine());
 		jumlahClause = N + (N * N * (N-1));
 		
@@ -21,9 +23,12 @@ public class Cnf {
 		result += diagonalKanan(N);
 		result += diagonalKiri(N);
 		
-		System.out.println("c CNF untuk " + N + "-Queens");
-		System.out.println("p cnf " + N + " " + jumlahClause);
-		System.out.print(result);
+		PrintWriter pw = new PrintWriter("input.cnf", "UTF-8");
+		pw.println("c CNF untuk " + N + "-Queens");
+		pw.println("p cnf " + N + " " + jumlahClause);
+		pw.print(result);
+		pw.close();
+		System.out.println("CNF disimpan dalam file: input.cnf");
 	}
 
 	public static String diagonalKanan(int n) {
