@@ -24,8 +24,8 @@ public class Cnf {
 		result += diagonalKiri(N);
 		
 		PrintWriter pw = new PrintWriter("input.cnf", "UTF-8");
-		pw.println("c CNF untuk " + (N * N) + "-Queens");
-		pw.println("p cnf " + N + " " + jumlahClause);
+		pw.println("c CNF untuk " + N + "-Queens");
+		pw.println("p cnf " + (N * N) + " " + jumlahClause);
 		pw.print(result);
 		pw.close();
 		System.out.println("CNF disimpan dalam file: input.cnf");
