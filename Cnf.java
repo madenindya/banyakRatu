@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 
 public class Cnf {
 
-	public static int N;
-	public static int jumlahClause;
+	private int N;
+	public int jumlahClause;
 
-	public static void main(String[] args) throws NumberFormatException,
+	public void getCnf() throws NumberFormatException,
 			IOException {
 
 		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
@@ -31,7 +31,7 @@ public class Cnf {
 		System.out.println("CNF disimpan dalam file: input.cnf");
 	}
 
-	public static String diagonalKanan(int n) {
+	private String diagonalKanan(int n) {
 		String result = "";
 		for (int i = 1; i < n; i++) {
 			for (int j = 1; j < n; j++) {
@@ -49,7 +49,7 @@ public class Cnf {
 		return result;
 	}
 
-	public static String diagonalKiri(int n) {
+	private String diagonalKiri(int n) {
 		String result = "";
 		for (int i = 1; i < n; i++) {
 			for (int j = n; j > 1; j--) {
@@ -67,7 +67,7 @@ public class Cnf {
 		return result;
 	}
 
-	public static String rowAssignment(int n){
+	private String rowAssignment(int n){
 		// Row Assignment
 		String sub1 = "";
 		String sub2 = "";
@@ -96,7 +96,7 @@ public class Cnf {
 	}
 	
 
-	public static String columnAssignment(int n){
+	private String columnAssignment(int n){
 		//combination
 		String sub2 = "";
 		for(int col = 1; col <= n; col++){
@@ -110,7 +110,7 @@ public class Cnf {
 		return sub2;
 	}
 
-	public static int getIndex(int row, int column) {
+	private int getIndex(int row, int column) {
 		return (N * (row - 1)) + column;
 	}
 }

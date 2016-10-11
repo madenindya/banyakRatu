@@ -7,7 +7,7 @@ import java.io.Writer;
 
 public class GenerateMore {
 
-    public static void main(String[] args) throws IOException {
+    public void generate() throws IOException {
         FileReader fr = new FileReader("output.cnf");
         BufferedReader tr = new BufferedReader(fr);
 
@@ -24,13 +24,31 @@ public class GenerateMore {
                 }
             }
             newClause += "0\n";
-            Writer bw = new BufferedWriter(new FileWriter("input.cnf", true));
-            bw.append(newClause);
+            
+            FileReader fr2 = new FileReader("input.cnf");
+            BufferedReader bf = new BufferedReader(fr2);
+            String result = "";
+            String line = bf.readLine(); 
+            while(line != null && line.length() > 0) {
+            	if (line.charAt(0) == 'p') {
+            		int idx = line.lastIndexOf(" ");
+            		int countClause = Integer.parseInt(line.substring(idx+1));
+            		countClause++;
+            		line = line.substring(0, idx) + " " + countClause;
+            	}
+            	result += line + "\n";
+            	line = bf.readLine();
+            }
+            result += newClause;
+            bf.close();
+            
+            Writer bw = new BufferedWriter(new FileWriter("input.cnf"));
+            bw.write(result);;
             bw.close();
     
             System.out.println("New Clause added to input.cnf");
         } else {
-            System.out.println("UNSAT")
+            System.out.println("UNSAT");
         }
     }
 }
