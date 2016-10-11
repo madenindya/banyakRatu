@@ -29,8 +29,6 @@ public class ChessGUI  {
     }
 
     public final void initializeGui() {
-        // create the images for the chess pieces
-        createImages();
 
         // set up the main GUI
         gui.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -38,7 +36,6 @@ public class ChessGUI  {
         tools.setFloatable(false);
         gui.add(tools, BorderLayout.PAGE_START);
         Action newGameAction = new AbstractAction("Solve") {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 setupNewGame();
@@ -109,7 +106,7 @@ public class ChessGUI  {
                   int index = (ii)*N+jj;
                   System.out.println(index);
                   if(configuration[(ii)*N+jj].charAt(0) != '-'){
-                    BufferedImage buff = ImageIO.read(new File("memI0.png"));
+                    BufferedImage buff = ImageIO.read(new File("queen.png"));
                     ImageIcon icon = new ImageIcon(buff);
                     b.setIcon(icon);
                   }
@@ -144,37 +141,18 @@ public class ChessGUI  {
         return gui;
     }
 
-    private final void createImages() {
-        try {
-            BufferedImage bi = ImageIO.read(new File("memI0.png"));
-            for (int ii = 0; ii < 2; ii++) {
-                for (int jj = 0; jj < 6; jj++) {
-                    chessPieceImages[ii][jj] = bi.getSubimage(
-                            jj * 64, ii * 64, 64, 64);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
 
     /**
      * Initializes the icons of the initial chess board piece places
      */
     private final void setupNewGame() {
         message.setText("Make your move!");
-        // set up the black pieces
-        for (int ii = 0; ii < 5; ii++) {
-            chessBoardSquares[ii][0].setIcon(new ImageIcon(
-                    chessPieceImages[BLACK][ii]));
-        }
 
     }
 
     public static void main(String[] args) throws IOException {
 
-      N = 5;
+      N = 4;
 
       FileReader fr = new FileReader("output.cnf");
       BufferedReader tr = new BufferedReader(fr);
@@ -182,7 +160,7 @@ public class ChessGUI  {
       configuration = new String[N];
       String isSat = tr.readLine();
       if (isSat.equals("SAT")) {
-        configuration = tr.readLine.split(" ");
+        configuration = tr.readLine().split(" ");
       }
 
         Runnable r = new Runnable() {
