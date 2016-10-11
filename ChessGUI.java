@@ -8,9 +8,10 @@ import java.awt.*;
 import java.io.*;
 import javax.imageio.*;
 
-public class ChessGUI {
-    public static final int N = 4;
-    public static final String[] configuration = {"-1", "2", "-3", "-4", "-5", "-6", "-7", "8", "9", "-10", "-11", "-12", "-13", "-14", "15", "-16"};
+public class ChessGUI  {
+    public static int N;
+    public static String[] configuration;
+
     private final JPanel gui = new JPanel(new BorderLayout(3, 3));
     private JButton[][] chessBoardSquares = new JButton[N][N];
     private Image[][] chessPieceImages = new Image[2][6];
@@ -171,7 +172,19 @@ public class ChessGUI {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+      N = 5;
+
+      FileReader fr = new FileReader("output.cnf");
+      BufferedReader tr = new BufferedReader(fr);
+
+      configuration = new String[N];
+      String isSat = tr.readLine();
+      if (isSat.equals("SAT")) {
+        configuration = tr.readLine.split(" ");
+      }
+
         Runnable r = new Runnable() {
 
             @Override
