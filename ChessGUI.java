@@ -9,20 +9,20 @@ import java.io.*;
 import javax.imageio.*;
 
 public class ChessGUI {
+    public static final int N = 4;
+    public static final String[] configuration = {"-1", "2", "-3", "-4", "-5", "-6", "-7", "8", "9", "-10", "-11", "-12", "-13", "-14", "15", "-16"};
     private final JPanel gui = new JPanel(new BorderLayout(3, 3));
     private JButton[][] chessBoardSquares = new JButton[N][N];
     private Image[][] chessPieceImages = new Image[2][6];
     private JPanel chessBoard;
     private final JLabel message = new JLabel(
             "Chess Champ is ready to play!");
-    public static final int N = 5;
     public static final int QUEEN = 0, KING = 1,
             ROOK = 2, KNIGHT = 3, BISHOP = 4, PAWN = 5;
     public static final int[] STARTING_ROW = {
         ROOK, KNIGHT, BISHOP, KING, QUEEN, BISHOP, KNIGHT, ROOK
     };
     public static final int BLACK = 0, WHITE = 1;
-    public static final int[] configuration = {1, 2, 3, 4, 5};
     ChessGUI() {
         initializeGui();
     }
@@ -105,9 +105,14 @@ public class ChessGUI {
                 // our chess pieces are 64x64 px in size, so we'll
                 // 'fill this in' using a transparent icon..
                 try{
-                  BufferedImage buff = ImageIO.read(new File("memI0.png"));
-                  ImageIcon icon = new ImageIcon(buff);
-                  b.setIcon(icon);
+                  int index = (ii)*N+jj;
+                  System.out.println(index);
+                  if(configuration[(ii)*N+jj].charAt(0) != '-'){
+                    BufferedImage buff = ImageIO.read(new File("memI0.png"));
+                    ImageIcon icon = new ImageIcon(buff);
+                    b.setIcon(icon);
+                  }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
@@ -120,6 +125,16 @@ public class ChessGUI {
                     b.setBackground(Color.BLACK);
                 }
                 chessBoardSquares[jj][ii] = b;
+            }
+        }
+
+        /*
+         * fill the chess board
+         */
+        // fill the black non-pawn piece row
+        for (int ii = 0; ii < N; ii++) {
+            for (int jj = 0; jj < N; jj++) {
+              chessBoard.add(chessBoardSquares[jj][ii]);
             }
         }
     }
@@ -162,7 +177,6 @@ public class ChessGUI {
             @Override
             public void run() {
                 ChessGUI cg = new ChessGUI();
-
                 JFrame f = new JFrame("ChessChamp");
                 f.add(cg.getGui());
                 // Ensures JVM closes after frame(s) closed and
