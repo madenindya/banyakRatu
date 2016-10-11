@@ -32,25 +32,6 @@ public class ChessGUI  {
 
         // set up the main GUI
         gui.setBorder(new EmptyBorder(5, 5, 5, 5));
-        JToolBar tools = new JToolBar();
-        tools.setFloatable(false);
-        gui.add(tools, BorderLayout.PAGE_START);
-        Action newGameAction = new AbstractAction("Solve") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setupNewGame();
-            }
-        };
-        tools.add(newGameAction);
-        tools.addSeparator();
-        JLabel n = new JLabel("n-size", JLabel.TRAILING);
-        JTextField textField = new JTextField(5);
-        tools.add(n); // TODO - add functionality!
-        n.setLabelFor(textField);
-        tools.add(textField);
-        tools.addSeparator();
-        tools.add(message);
-
         gui.add(new JLabel("?"), BorderLayout.LINE_START);
 
         chessBoard = new JPanel(new GridLayout(0, N)) {
@@ -104,8 +85,7 @@ public class ChessGUI  {
                 // 'fill this in' using a transparent icon..
                 try{
                   int index = (ii)*N+jj;
-                  System.out.println(index);
-                  if(configuration[(ii)*N+jj].charAt(0) != '-'){
+                  if(configuration[index].charAt(0) != '-'){
                     BufferedImage buff = ImageIO.read(new File("queen.png"));
                     ImageIcon icon = new ImageIcon(buff);
                     b.setIcon(icon);
@@ -129,7 +109,6 @@ public class ChessGUI  {
         /*
          * fill the chess board
          */
-        // fill the black non-pawn piece row
         for (int ii = 0; ii < N; ii++) {
             for (int jj = 0; jj < N; jj++) {
               chessBoard.add(chessBoardSquares[jj][ii]);
@@ -153,7 +132,6 @@ public class ChessGUI  {
     public static void main(String[] args) throws IOException {
 
       N = 4;
-
       FileReader fr = new FileReader("output.cnf");
       BufferedReader tr = new BufferedReader(fr);
 
@@ -167,20 +145,53 @@ public class ChessGUI  {
 
             @Override
             public void run() {
-                ChessGUI cg = new ChessGUI();
-                JFrame f = new JFrame("ChessChamp");
-                f.add(cg.getGui());
-                // Ensures JVM closes after frame(s) closed and
-                // all non-daemon threads are finished
-                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                // See http://stackoverflow.com/a/7143398/418556 for demo.
-                f.setLocationByPlatform(true);
-                // ensures the frame is the minimum size it needs to be
-                // in order display the components within it
-                f.pack();
-                // ensures the minimum size is enforced.
-                f.setMinimumSize(f.getSize());
-                f.setVisible(true);
+              JPanel begin_panel = new JPanel(new BorderLayout(3, 3));
+              begin_panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+              JToolBar begin_tools = new JToolBar();
+              begin_tools.setFloatable(false);
+              begin_panel.add(begin_tools, BorderLayout.PAGE_START);
+
+              JLabel m = new JLabel("n-size", JLabel.TRAILING);
+              final JTextField textField = new JTextField(5);
+              begin_tools.add(m); // TODO - add functionality!
+              m.setLabelFor(textField);
+              begin_tools.add(textField);
+              Action newGameAction = new AbstractAction("Solve") {
+                  @Override
+                  public void actionPerformed(ActionEvent e) {
+                    int n = Integer.parseInt(textField.getText());
+
+                    ChessGUI cg = new ChessGUI();
+
+                    JFrame f = new JFrame("N-Queens using SAT");
+                    f.add(cg.getGui());
+                    // Ensures JVM closes after frame(s) closed and
+                    // all non-daemon threads are finished
+                    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    // See http://stackoverflow.com/a/7143398/418556 for demo.
+                    f.setLocationByPlatform(true);
+                    // ensures the frame is the minimum size it needs to be
+                    // in order display the components within it
+                    f.pack();
+                    // ensures the minimum size is enforced.
+                    f.setMinimumSize(f.getSize());
+                    f.setVisible(true);
+                  }
+              };
+
+              begin_tools.add(newGameAction);
+              begin_tools.addSeparator();
+
+
+              JFrame begin_frame = new JFrame("N-Queens");
+              begin_panel.setPreferredSize(new Dimension(200, 30));
+              begin_frame.setLocation(150, 100);
+              begin_frame.add(begin_panel);
+              begin_frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+              begin_frame.pack();
+              begin_frame.setMinimumSize(begin_frame.getSize());
+              begin_frame.setResizable(false);
+              begin_frame.setVisible(true);
             }
         };
 
