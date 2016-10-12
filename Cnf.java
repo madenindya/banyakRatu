@@ -8,21 +8,20 @@ public class Cnf {
 	private int N;
 	public int jumlahClause;
 
-	public void getCnf() throws NumberFormatException,
-			IOException {
+	public void getCnf() throws NumberFormatException, IOException {
 
 		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-		
+
 		System.out.print("Masukan ukuran board: ");
 		N = Integer.parseInt(bf.readLine());
-		jumlahClause = N + (N * N * (N-1));
-		
+		jumlahClause = N + (N * N * (N - 1));
+
 		String result = "";
 		result += rowAssignment(N);
 		result += columnAssignment(N);
 		result += diagonalKanan(N);
 		result += diagonalKiri(N);
-		
+
 		PrintWriter pw = new PrintWriter("input.cnf", "UTF-8");
 		pw.println("c CNF untuk " + N + "-Queens");
 		pw.println("p cnf " + (N * N) + " " + jumlahClause);
@@ -45,7 +44,7 @@ public class Cnf {
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -63,15 +62,15 @@ public class Cnf {
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
-	private String rowAssignment(int n){
+	private String rowAssignment(int n) {
 		// Row Assignment
 		String sub1 = "";
 		String sub2 = "";
-		
+
 		// Assignment value
 		for (int j = 1; j <= n; j++) {
 			for (int i = 1; i <= n; i++) {
@@ -82,11 +81,11 @@ public class Cnf {
 				}
 			}
 		}
-		
+
 		// column restriction
 		for (int i = 1; i <= n; i++) {
 			for (int j = 1; j < n; j++) {
-				for (int k = j+1; k <= n; k++) {
+				for (int k = j + 1; k <= n; k++) {
 					sub2 += -getIndex(i, j) + " " + -getIndex(i, k) + " 0\n";
 				}
 			}
@@ -94,15 +93,15 @@ public class Cnf {
 
 		return sub1 + sub2;
 	}
-	
 
-	private String columnAssignment(int n){
-		//combination
+	private String columnAssignment(int n) {
+		// combination
 		String sub2 = "";
-		for(int col = 1; col <= n; col++){
-			for(int pivotRow = 1; pivotRow <= n-1; pivotRow++){
-				for(int combination = pivotRow+1; combination <=n; combination++){
-					sub2 += "-" + getIndex(pivotRow, col) + " -" + getIndex(combination, col) + " 0\n";
+		for (int col = 1; col <= n; col++) {
+			for (int pivotRow = 1; pivotRow <= n - 1; pivotRow++) {
+				for (int combination = pivotRow + 1; combination <= n; combination++) {
+					sub2 += "-" + getIndex(pivotRow, col) + " -"
+							+ getIndex(combination, col) + " 0\n";
 				}
 			}
 		}
