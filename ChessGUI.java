@@ -3,209 +3,263 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.border.*;
-import java.net.URL;
-import java.awt.*;
+import org.sat4j.specs.TimeoutException;
 import java.io.*;
+import java.net.URISyntaxException;
+
 import javax.imageio.*;
 
 public class ChessGUI  {
-    public static int N;
-    public static String[] configuration;
+	public int N;
+	public String[] configuration;
+	public static int beforeN=-1;
 
-    private final JPanel gui = new JPanel(new BorderLayout(3, 3));
-    private JButton[][] chessBoardSquares = new JButton[N][N];
-    private Image[][] chessPieceImages = new Image[2][6];
-    private JPanel chessBoard;
-    private final JLabel message = new JLabel(
-            "Chess Champ is ready to play!");
-    public static final int QUEEN = 0, KING = 1,
-            ROOK = 2, KNIGHT = 3, BISHOP = 4, PAWN = 5;
-    public static final int[] STARTING_ROW = {
-        ROOK, KNIGHT, BISHOP, KING, QUEEN, BISHOP, KNIGHT, ROOK
-    };
-    public static final int BLACK = 0, WHITE = 1;
-    ChessGUI() {
-        initializeGui();
-    }
+	private JPanel gui = null;
+	private JButton[][] chessBoardSquares;
+	private JPanel chessBoard;
+	@SuppressWarnings("unused")
+	private final JLabel message = new JLabel(
+			"Chess Champ is ready to play!");
+	public final int QUEEN = 0, KING = 1,
+			ROOK = 2, KNIGHT = 3, BISHOP = 4, PAWN = 5;
+	public final int[] STARTING_ROW = {
+			ROOK, KNIGHT, BISHOP, KING, QUEEN, BISHOP, KNIGHT, ROOK
+	};
+	public final int BLACK = 0, WHITE = 1;
 
-    public final void initializeGui() {
-        // create the images for the chess pieces
-        createImages();
+	ChessGUI(){
+	}
 
-        // set up the main GUI
-        gui.setBorder(new EmptyBorder(5, 5, 5, 5));
-        JToolBar tools = new JToolBar();
-        tools.setFloatable(false);
-        gui.add(tools, BorderLayout.PAGE_START);
-        Action newGameAction = new AbstractAction("Solve") {
+	ChessGUI(int n, boolean moreFlag)  {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setupNewGame();
-            }
-        };
-        tools.add(newGameAction);
-        tools.addSeparator();
-        JLabel n = new JLabel("n-size", JLabel.TRAILING);
-        JTextField textField = new JTextField(5);
-        tools.add(n); // TODO - add functionality!
-        n.setLabelFor(textField);
-        tools.add(textField);
-        tools.addSeparator();
-        tools.add(message);
+		try {
+			this.N = n;
+			beforeN = N;
+			initializeGui(moreFlag);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	} 
 
-        gui.add(new JLabel("?"), BorderLayout.LINE_START);
+	@SuppressWarnings("resource")
+	public final void initializeGui (boolean moreFlag) throws IOException, TimeoutException {
 
-        chessBoard = new JPanel(new GridLayout(0, N)) {
-            /**
-             * Override the preferred size to return the largest it can, in
-             * a square shape.  Must (must, must) be added to a GridBagLayout
-             * as the only component (it uses the parent as a guide to size)
-             * with no GridBagConstaint (so it is centered).
-             */
-            @Override
-            public final Dimension getPreferredSize() {
-                Dimension d = super.getPreferredSize();
-                Dimension prefSize = null;
-                Component c = getParent();
-                if (c == null) {
-                    prefSize = new Dimension(
-                            (int)d.getWidth(),(int)d.getHeight());
-                } else if (c!=null &&
-                        c.getWidth()>d.getWidth() &&
-                        c.getHeight()>d.getHeight()) {
-                    prefSize = c.getSize();
-                } else {
-                    prefSize = d;
-                }
-                int w = (int) prefSize.getWidth();
-                int h = (int) prefSize.getHeight();
-                // the smaller of the two sizes
-                int s = (w>h ? h : w);
-                return new Dimension(s,s);
-            }
-        };
-        chessBoard.setBorder(new CompoundBorder(
-                new EmptyBorder(8,8,8,8),
-                new LineBorder(Color.BLACK)
-                ));
-        // Set the BG to be ochre
-        Color ochre = new Color(204,119,34);
-        chessBoard.setBackground(ochre);
-        JPanel boardConstrain = new JPanel(new GridBagLayout());
-        boardConstrain.setBackground(ochre);
-        boardConstrain.add(chessBoard);
-        gui.add(boardConstrain);
+		if(moreFlag){
+			GenerateMore generateMore = new GenerateMore();
+			generateMore.generate();
+		}else{
+			Cnf cnf = new Cnf();
+			cnf.getCnf(N);
+		}
 
-        // create the chess board squares
-        Insets buttonMargin = new Insets(0, 0, 0, 0);
-        for (int ii = 0; ii < chessBoardSquares.length; ii++) {
-            for (int jj = 0; jj < chessBoardSquares[ii].length; jj++) {
-                JButton b = new JButton();
-                b.setMargin(buttonMargin);
-                // our chess pieces are 64x64 px in size, so we'll
-                // 'fill this in' using a transparent icon..
-                try{
-                  int index = (ii)*N+jj;
-                  System.out.println(index);
-                  if(configuration[(ii)*N+jj].charAt(0) != '-'){
-                    BufferedImage buff = ImageIO.read(new File("memI0.png"));
-                    ImageIcon icon = new ImageIcon(buff);
-                    b.setIcon(icon);
-                  }
+		SATSolver SAT = new SATSolver();
+		try {
+			SAT.solve();
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		chessBoardSquares = new JButton[N][N];
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+		FileReader fr = new FileReader("output.cnf");
+		BufferedReader tr = new BufferedReader(fr);
 
-                if ((jj % 2 == 1 && ii % 2 == 1)
-                        || (jj % 2 == 0 && ii % 2 == 0)) {
-                    b.setBackground(Color.WHITE);
-                } else {
-                    b.setBackground(Color.BLACK);
-                }
-                chessBoardSquares[jj][ii] = b;
-            }
-        }
+		String isSat = tr.readLine();
+		if (isSat.equals("SAT")) {
+			configuration = new String[N];
+			String cnfString =tr.readLine(); 
+			configuration = cnfString.split(" ");
+		}else{
+			return;
+		}
 
-        /*
-         * fill the chess board
-         */
-        // fill the black non-pawn piece row
-        for (int ii = 0; ii < N; ii++) {
-            for (int jj = 0; jj < N; jj++) {
-              chessBoard.add(chessBoardSquares[jj][ii]);
-            }
-        }
-    }
+		this.gui = new JPanel(new BorderLayout(3, 3));
 
-    public final JComponent getGui() {
-        return gui;
-    }
+		// set up the main GUI
+		gui.setBorder(new EmptyBorder(5, 5, 5, 5));
+		gui.add(new JLabel("?"), BorderLayout.LINE_START);
 
-    private final void createImages() {
-        try {
-            BufferedImage bi = ImageIO.read(new File("memI0.png"));
-            for (int ii = 0; ii < 2; ii++) {
-                for (int jj = 0; jj < 6; jj++) {
-                    chessPieceImages[ii][jj] = bi.getSubimage(
-                            jj * 64, ii * 64, 64, 64);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
+		chessBoard = new JPanel(new GridLayout(0, N)) {
+			private static final long serialVersionUID = 1L;
 
-    /**
-     * Initializes the icons of the initial chess board piece places
-     */
-    private final void setupNewGame() {
-        message.setText("Make your move!");
-        // set up the black pieces
-        for (int ii = 0; ii < 5; ii++) {
-            chessBoardSquares[ii][0].setIcon(new ImageIcon(
-                    chessPieceImages[BLACK][ii]));
-        }
+			@Override
+			public final Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				Dimension prefSize = null;
+				Component c = getParent();
+				if (c == null) {
+					prefSize = new Dimension(
+							(int)d.getWidth(),(int)d.getHeight());
+				} else if (c!=null &&
+						c.getWidth()>d.getWidth() &&
+						c.getHeight()>d.getHeight()) {
+					prefSize = c.getSize();
+				} else {
+					prefSize = d;
+				}
+				int w = (int) prefSize.getWidth();
+				int h = (int) prefSize.getHeight();
+				// the smaller of the two sizes
+				int s = (w>h ? h : w);
+				return new Dimension(s,s);
+			}
+		};
+		chessBoard.setBorder(new CompoundBorder(
+				new EmptyBorder(8,8,8,8),
+				new LineBorder(Color.BLACK)
+				));
+		// Set the BG to be ochre
+		Color ochre = new Color(204,119,34);
+		chessBoard.setBackground(ochre);
+		JPanel boardConstrain = new JPanel(new GridBagLayout());
+		boardConstrain.setBackground(ochre);
+		boardConstrain.add(chessBoard);
+		gui.add(boardConstrain);
 
-    }
+		// create the chess board squares
+		Insets buttonMargin = new Insets(0, 0, 0, 0);
+		for (int ii = 0; ii < chessBoardSquares.length; ii++) {
+			for (int jj = 0; jj < chessBoardSquares[ii].length; jj++) {
+				JButton b = new JButton();
+				b.setMargin(buttonMargin);
+				try{
+					int index = (ii)*N+jj;
+					if(configuration[index].charAt(0) != '-'){
+						File f = new File(System.getProperty("java.class.path"));
+						File dir = f.getAbsoluteFile().getParentFile();
+						String jarDir = dir.toString();
+						BufferedImage buff = ImageIO.read(new File(jarDir+"/queen.png"));
+						ImageIcon icon = new ImageIcon(buff);
+						b.setIcon(icon);
+					}
 
-    public static void main(String[] args) throws IOException {
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
 
-      N = 5;
+				if ((jj % 2 == 1 && ii % 2 == 1)
+						|| (jj % 2 == 0 && ii % 2 == 0)) {
+					b.setBackground(Color.WHITE);
+				} else {
+					b.setBackground(Color.BLACK);
+				}
+				chessBoardSquares[jj][ii] = b;
+			}
+		}
 
-      FileReader fr = new FileReader("output.cnf");
-      BufferedReader tr = new BufferedReader(fr);
+		/*
+		 * fill the chess board
+		 */
+		for (int ii = 0; ii < N; ii++) {
+			for (int jj = 0; jj < N; jj++) {
+				chessBoard.add(chessBoardSquares[jj][ii]);
+			}
+		}
+	}
 
-      configuration = new String[N];
-      String isSat = tr.readLine();
-      if (isSat.equals("SAT")) {
-        configuration = tr.readLine.split(" ");
-      }
+	public final JComponent getGui() {
+		return gui;
+	}
 
-        Runnable r = new Runnable() {
+	public void createGUI() throws IOException {
 
-            @Override
-            public void run() {
-                ChessGUI cg = new ChessGUI();
-                JFrame f = new JFrame("ChessChamp");
-                f.add(cg.getGui());
-                // Ensures JVM closes after frame(s) closed and
-                // all non-daemon threads are finished
-                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                // See http://stackoverflow.com/a/7143398/418556 for demo.
-                f.setLocationByPlatform(true);
-                // ensures the frame is the minimum size it needs to be
-                // in order display the components within it
-                f.pack();
-                // ensures the minimum size is enforced.
-                f.setMinimumSize(f.getSize());
-                f.setVisible(true);
-            }
-        };
+		Runnable r = new Runnable() {
+			@SuppressWarnings("serial")
+			@Override
+			public void run() {
+				JPanel begin_panel = new JPanel(new BorderLayout(3, 3));
+				begin_panel.setBorder(new EmptyBorder(25, 25, 25, 25));
+				JToolBar begin_tools = new JToolBar();
+				begin_tools.setFloatable(false);
+				begin_panel.add(begin_tools, BorderLayout.PAGE_START);
 
-        SwingUtilities.invokeLater(r);
-    }
+				JLabel m = new JLabel("Masukan ukuran n  ", JLabel.TRAILING);
+				final JTextField textField = new JTextField(3);
+				begin_tools.add(m); // TODO - add functionality!
+				m.setLabelFor(textField);
+				begin_tools.add(textField);
+
+				Action nSizeAction = new AbstractAction("Solve") {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+
+						int inputN;
+						try {  
+							inputN = Integer.parseInt(textField.getText());
+						}  
+						catch(NumberFormatException nfe) {  
+							JOptionPane.showMessageDialog(null, "Isi size dengan angka", "Invalid Size", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}  
+
+						ChessGUI cg = new ChessGUI(inputN, false);
+						JFrame f = new JFrame("N-Queens using SAT");
+						if(cg.getGui() != null){
+							f.add(cg.getGui());
+							f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+							f.setLocationByPlatform(true);
+							f.pack();
+							f.setMinimumSize(f.getSize());
+							f.setVisible(true);
+						}else{
+							JOptionPane.showMessageDialog(null, "Unsatisfiable, tidak dapat dibuat.", "Unsatisfiable", JOptionPane.INFORMATION_MESSAGE);
+						}
+					}
+				};
+
+				Action moreAction = new AbstractAction("More") {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+
+						int inputN;
+						try {  
+							inputN = Integer.parseInt(textField.getText());
+							if(beforeN != inputN){
+								JOptionPane.showMessageDialog(null, "Size berbeda. Gunakan button solve", "Error", JOptionPane.INFORMATION_MESSAGE);
+								return;
+							}
+						}  
+						catch(NumberFormatException nfe) {  
+							JOptionPane.showMessageDialog(null, "Isi size dengan angka", "Invalid Size", JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}  
+
+						ChessGUI cg = new ChessGUI(inputN, true);
+						JFrame f = new JFrame("N-Queens Another Combination");
+						if(cg.getGui() != null){
+							f.add(cg.getGui());
+							f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+							f.setLocationByPlatform(true);
+							f.pack();
+							f.setMinimumSize(f.getSize());
+							f.setVisible(true);
+						}else{
+							JOptionPane.showMessageDialog(null, "Tidak ada kombinasi lain.", "Unsatisfiable", JOptionPane.INFORMATION_MESSAGE);
+						}
+					}
+				};
+
+				begin_tools.add(nSizeAction);
+				begin_tools.add(moreAction);
+
+				begin_tools.addSeparator();
+				JFrame begin_frame = new JFrame("N-Queens using SAT");
+				begin_panel.setPreferredSize(new Dimension(400, 100));
+				begin_frame.setLocation(150, 100);
+				begin_frame.add(begin_panel);
+				begin_frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				begin_frame.pack();
+				begin_frame.setMinimumSize(begin_frame.getSize());
+				begin_frame.setResizable(true);
+				begin_frame.setVisible(true);
+			}
+		};
+
+		SwingUtilities.invokeLater(r);
+	}
 }
