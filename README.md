@@ -1,3 +1,8 @@
 # banyakRatu
+
 n-Queen SAT Solver
-Our problem to CNF parsing is inside Cnf.java
+
+Generate Rules `Cnf.java`
+
+### How to Run
+For now, just use Eclipse :D
